@@ -54,3 +54,4 @@ for i, val in enumerate(Eb_N0_dB):
     ber = num_errors / len(bits)
     BER_array[i] = ber
     print(f"Bit Error Rate: {BER_array} \n")
+# Next in Line: attempt to model the fading channel using different models
