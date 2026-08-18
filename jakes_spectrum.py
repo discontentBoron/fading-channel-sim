@@ -1,14 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-f_c = 2e9
-f_s = 10e3
-N = int(50e3)
-t = np.arange(N) / f_s
-freq = np.fft.fftfreq(int(N), d=1 / f_s)
+# f_c = 2e9
+# f_s = 10e3
+# N = int(50e3)
+# t = np.arange(N) / f_s
+# freq = np.fft.fftfreq(int(N), d=1 / f_s)
 
 
-def generate_rayleigh_fading(
+def generate_rayleigh_fading_smith(
     f_c: float, freq: np.ndarray, v_kph: float, f_s: float, N: int
 ):
     """
@@ -48,23 +48,23 @@ def generate_rayleigh_fading(
     return h_t, fd_max, S
 
 
-speeds = [20, 60, 120]
-results = {}
-for v in speeds:
-    h_t, fd_max, S = generate_rayleigh_fading(f_c, freq, v, f_s, N)
-    results[v] = (h_t, fd_max, S)
+# speeds = [20, 60, 120]
+# results = {}
+# for v in speeds:
+#     h_t, fd_max, S = generate_rayleigh_fading_smith(f_c, freq, v, f_s, N)
+#     results[v] = (h_t, fd_max, S)
 
-t = np.arange(N) / f_s
+# t = np.arange(N) / f_s
 
-fig, axes = plt.subplots(3, 1, figsize=(12, 8), sharex=True)
-for ax, v in zip(axes, speeds):
-    h_t, fd_max, S = results[v]
-    ax.plot(t, np.abs(h_t))
-    ax.set_ylabel("|h(t)|")
-    ax.set_title(f"{v} kmph (fd_max = {fd_max:.1f} Hz)")
-axes[-1].set_xlabel("Time (s)")
-plt.tight_layout()
-plt.show()
+# fig, axes = plt.subplots(3, 1, figsize=(12, 8), sharex=True)
+# for ax, v in zip(axes, speeds):
+#     h_t, fd_max, S = results[v]
+#     ax.plot(t, np.abs(h_t))
+#     ax.set_ylabel("|h(t)|")
+#     ax.set_title(f"{v} kmph (fd_max = {fd_max:.1f} Hz)")
+# axes[-1].set_xlabel("Time (s)")
+# plt.tight_layout()
+# plt.show()
 # Plots
 # Frequency domain plot of S(f)
 """S_shifted = np.fft.fftshift(S)
