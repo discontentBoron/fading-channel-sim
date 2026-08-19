@@ -1,7 +1,11 @@
+from demodulate import demodulate_qpsk_mmse
+from demodulate import demodulate_qpsk_zf
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 from jakes_spectrum import generate_rayleigh_fading_smith
+from demodulate import *
+
 # Number of bits to generate, 10^5 bits generated
 # with a seed value for reproducibility purposes.
 bit_size = int(1e5)
@@ -56,25 +60,6 @@ def estimate_channel(rx_symbol, pilot_indices, pilot_symbol, N):
     h_est = real_interp(time_all) + 1j * imag_interp(time_all)
     return h_est
 
-def demodulate_qpsk(received_sig, h_t):
-    ## Demodulation
-    epsilon = 1e-9 # Small change for divide by zero error
-    mag = np.abs(h_t)
-    phase = np.angle(h_t)
-    mag_safe = np.maximum(mag, epsilon) #any value smaller than epsilon gets replaced by epsilon itself
-    h_t_safe = mag_safe * np.exp(1j * phase) 
-    eq_sig = received_sig/h_t_safe
-
-    detected_sig_real = eq_sig.real
-    detected_sig_imag = eq_sig.imag
-
-    detected_b1 = (detected_sig_real > 0).astype(int)
-    detected_b0 = (detected_sig_imag > 0).astype(int)
-
-    interleaved_bits = np.column_stack((detected_b1, detected_b0))
-    detected_bits = interleaved_bits.flatten()
-
-    return detected_bits
 
 def calculate_ber(detected_bits, bits, pilot_indices=None):
     ## BER calculation
@@ -114,10 +99,12 @@ def simulate_qpsk():
         BER_array = np.zeros(len(Eb_N0_dB_range))
 
         for i, Eb_N0_dB in enumerate(Eb_N0_dB_range):
+            Eb_N0_linear = 10**(Eb_N0_dB/10)
+            N0 = 1/(2*Eb_N0_linear)
             noise_sig = gen_awgn_noise(len(qpsk_signal), Eb_N0_dB)
             received_sig = h_t * tx_sig + noise_sig
             h_est = estimate_channel(received_sig, pilot_indices, pilot_sym, N)
-            detected_bits = demodulate_qpsk(received_sig, h_est)
+            detected_bits = demodulate_qpsk_zf(received_sig, h_t)
             ber = calculate_ber(detected_bits, bits, pilot_indices)
             BER_array[i] = ber
 
