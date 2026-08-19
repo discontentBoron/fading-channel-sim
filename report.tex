@@ -1,0 +1,215 @@
+\documentclass[12pt]{article}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\title{Effect of Vehicle Speed on Wireless Communication: \\
+Doppler Shift and Rayleigh Fading Analysis}
+\author{Hariharan G \\ 1CR23EC069}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Objective}
+To investigate the effects of changing vehicle or the receiver speed affects the Wireless
+communication quality by studying the impact of Doppler shift and Rayleigh fading on the 
+Bit Error Rate (BER) of a Quadrature Phase Shift Keying (QPSK) communication systems.
+
+\section{Problem Statement}
+
+Mobile Wireless communication systems must contend with a time-varying channel caused by 
+the relative motion between the transmitter and receiver. This mostion introduces a Doppler 
+shift in the received signal frequency, and when combined with multipath propagation, gives 
+rise to Rayleigh fading, a rapid and random fluctuations in the received signal envelope. 
+As vehicle speed increases, the channel decorrelates more quickly (shorter
+coherence time), which can degrade the reliability of digital communication systems 
+that rely on accurate channel knowledge at the receiver.
+
+This project investigates the extent to which vehicle speed affects wireless link 
+performance, distinguishing between the fundamental statistical effect of fading 
+itself and the practical effect of a receiver's ability (or inability) to track
+a fast-changing channel using periodic pilot symbols.
+
+\section{Theory and Background}
+\subsection{Doppler Fading}
+Doppler Fading is a unique aspect of wireless communication systems. The Doppler shift is 
+fundamental principle related to the electromagnetic radio-wave propagation. The Doppler shift 
+associated with an electromagnetic wave is deﬁned as the perceived change in the frequency of 
+the wave due to relative motion between the transmitter and receiver. 
+
+The Doppler shift is given by \cite{adithya}: 
+\begin{equation}
+    f_d = \frac{v}{\lambda}\cos\theta = \frac{v f_c}{c}\cos\theta
+    \label{eq:doppler}
+\end{equation}
+where $\theta$ is the angle of the line joining the mobile receiver and the base station, $v$ is the
+velocity of the mobile receiver, $f_c$ is the carrier frequency, and $c$ is the speed of light.
+
+\subsection{Multipath Propagation and Rayleigh Fading}
+
+In a mobile environment without a dominant line-of-sight path,
+the received signal is the sum of many multipath components
+arriving from different angles, each with a random amplitude,
+phase, and Doppler shift. By the Central Limit Theorem, the
+in-phase and quadrature components of the resulting received
+signal approach independent, zero-mean Gaussian random
+processes for a large number of scatterers \cite{stuber}. The
+envelope of this process, $|h(t)|$, is Rayleigh distributed:
+
+\begin{equation}
+    p(r) = \frac{r}{\sigma^2}\exp\left(-\frac{r^2}{2\sigma^2}\right), \quad r \geq 0
+    \label{eq:rayleigh_pdf}
+\end{equation}
+
+This model, known as \textit{Clarke's reference model}, forms
+the theoretical basis for simulating Rayleigh fading channels.
+
+
+\subsection{Jakes Doppler Power Spectrum}
+
+The multipath components do not arrive with a single Doppler
+shift, but rather span the range $[-f_{d,max}, f_{d,max}]$, where $f_{d,max}$ is the maximum 
+frequency deviation. The resulting Doppler power spectral density, known as the Jakes
+spectrum, is given by:
+
+\begin{equation}
+    S(f) = \frac{1}{\pi f_{d,max}\sqrt{1-(f/f_{d,max})^2}}, \quad |f| < f_{d,max}
+    \label{eq:jakes_spectrum}
+\end{equation}
+
+This characteristic ``bathtub'' shape governs how quickly the
+fading channel varies in time: a larger $f_{d,max}$ (higher
+speed) corresponds to a wider spectral spread, and therefore a
+faster-varying channel envelope.
+
+\subsection{Coherence Time}
+
+The coherence time $T_c$ is a statistical measure of the time
+duration over which the channel can be considered approximately
+constant. A common approximation is \cite{rappaport}:
+
+\begin{equation}
+    T_c \approx \frac{9}{16\pi f_{d,max}}
+    \label{eq:coherence_time}
+\end{equation}
+
+As speed increases, $f_{d,max}$ increases, and $T_c$ which means that
+the channel changes more rapidly, and any channel knowledge obtained by the receiver becomes 
+outdated more quickly.
+
+\subsection{Rayleigh Fading Channel Simulation Methods}
+
+Two independent methods were used in this project to generate
+a discrete-time, correlated Rayleigh fading channel $h(t)$:
+
+\subsubsection{Smith's Spectral Simulation Method}
+
+This method shapes complex white Gaussian noise in the
+frequency domain by the square root of the Jakes power
+spectrum (Eq.~\ref{eq:jakes_spectrum}), and then applies an
+inverse FFT to obtain a time-domain fading waveform. This
+approach is a discrete, computationally efficient realization of
+the filtering technique originally proposed by Jakes
+\cite{jakes} and formalized by Smith.
+
+
+\subsubsection{Zheng--Xiao Sum-of-Sinusoids Method}
+
+This method constructs $h(t)$ directly as a sum of a small
+number ($M$) of sinusoids with randomized phase, angle of
+arrival, and initial phase parameters \cite{zhengxiao}:
+
+\begin{align}
+    X_c(t) &= \frac{2}{\sqrt{M}}\sum_{n=1}^{M}\cos(\psi_n)\cos(w_d t \cos\alpha_n + \phi) \\
+    X_s(t) &= \frac{2}{\sqrt{M}}\sum_{n=1}^{M}\sin(\psi_n)\cos(w_d t \cos\alpha_n + \phi)
+\end{align}
+
+with $\alpha_n = \frac{2\pi n - \pi + \theta}{4M}$, and $\theta$,
+$\phi$, $\psi_n$ independently and uniformly distributed on
+$[-\pi,\pi]$. Zheng and Xiao proved that this construction
+yields exact second-order statistics (autocorrelation) matching
+the theoretical Rayleigh reference model, even for small $M$
+(e.g., $M=8$), unlike the original deterministic Jakes
+simulator.
+
+\subsection{QPSK Modulation}
+
+Quadrature Phase Shift Keying (QPSK) maps pairs of bits to one
+of four constellation points on the unit circle. With
+Gray-coded mapping and normalized average symbol energy
+$E_s = 1$, the transmitted symbol is:
+
+\begin{equation}
+    s = \frac{1}{\sqrt{2}}\left[(2b_1-1) + j(2b_0-1)\right]
+    \label{eq:qpsk_symbol}
+\end{equation}
+
+where $b_1, b_0 \in \{0,1\}$ are the two bits mapped to that
+symbol.
+
+\subsection{Channel Model and Signal-to-Noise Ratio}
+
+The received signal after passing through a flat-fading channel
+with additive white Gaussian noise (AWGN) is modeled as:
+
+\begin{equation}
+    y(t) = h(t)\,s(t) + n(t)
+    \label{eq:channel_model}
+\end{equation}
+
+Since QPSK conveys 2 bits per symbol, $E_s = 2E_b$. With
+$E_s=1$, the noise spectral density corresponding to a given
+$E_b/N_0$ (linear) is:
+
+\begin{equation}
+    N_0 = \frac{1}{2(E_b/N_0)}
+    \label{eq:n0}
+\end{equation}
+
+\subsection{Equalization and Channel State Information (CSI)}
+
+To recover the transmitted symbol, the receiver must undo the
+channel's effect, which requires knowledge of $h(t)$ --
+referred to as Channel State Information (CSI). Two CSI
+scenarios were studied:
+
+\begin{itemize}
+    \item \textbf{Perfect CSI}: the receiver has exact,
+    instantaneous knowledge of $h(t)$.
+    \item \textbf{Estimated CSI}: the receiver estimates $h(t)$
+    only at known pilot symbol positions and interpolates
+    between them, as is done in practical systems.
+\end{itemize}
+
+Two equalization strategies were implemented:
+
+\begin{align}
+    \text{Zero-Forcing (ZF):} \quad & \hat{s} = \frac{y}{h} \label{eq:zf}\\
+    \text{MMSE:} \quad & \hat{s} = \frac{h^{*}}{|h|^2 + N_0}\, y \label{eq:mmse}
+\end{align}
+
+ZF perfectly inverts the channel but amplifies noise
+significantly when $|h|$ is small (deep fade). MMSE balances
+channel inversion against noise amplification, and reduces to
+ZF at high SNR.
+
+\subsection{Theoretical QPSK BER over Rayleigh Fading}
+
+For QPSK with coherent detection over a Rayleigh fading channel
+under perfect CSI, the average BER as a function of average
+$E_b/N_0$ ($\gamma$) has the closed-form expression
+\cite{simon_alouini}:
+
+\begin{equation}
+    P_b = \frac{1}{2}\left(1 - \sqrt{\frac{\gamma}{1+\gamma}}\right)
+    \label{eq:theoretical_ber}
+\end{equation}
+
+This expression is used throughout this report as the reference
+for validating simulation results.
+
+\end{document}
