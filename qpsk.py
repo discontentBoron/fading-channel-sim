@@ -1,5 +1,23 @@
 import numpy as np
 
+def modulate_qpsk(bits):
+    bit_size = len(bits)
+    # Reshaped the continuous bitstream to pairs of bits for qpsk modulation scheme
+    # and separate the bits to get the real and imaginary parts and normalize by 1/sqrt(2) to
+    # have average symbol energy of 1.
+    bit_reshape = np.reshape(bits, (int(bit_size / 2), 2))
+    # print(bit_reshape)
+
+    b1 = bit_reshape[:, 0]
+    b0 = bit_reshape[:, 1]
+    # print(b1)
+    # print(b0)
+    real_part = 2 * b1 - 1
+    imag_part = 2 * b0 - 1
+    qpsk_signal = np.sqrt(1 / 2) * (real_part + 1j * imag_part)
+    # print(qpsk_signal)
+    return qpsk_signal
+
 def demodulate_qpsk_zf(received_sig, h_t):
     ## Demodulation
     epsilon = 1e-9 # Small change for divide by zero error
