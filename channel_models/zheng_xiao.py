@@ -4,35 +4,10 @@ import matplotlib.pyplot as plt
 
 
 def generate_rayleigh_fading_zx(M:int, N:int, f_s:float, f_c:float, v_kph:float):
-    """
-    Generate a complex Rayleigh fading channel using the Statistical Sum 
-    of Sinusoids method.
-
-    Parameters
-    ----------
-    M   : int 
-        Number of Sinusoids
-    N   : int
-        Number of time-domain samples to generate.
-    f_s : float
-        Sampling rate in Hz.
-    f_c : float
-        Carrier frequency in Hz.
-    v_kph : float
-        Mobile speed in km/h.
-        
-    Returns
-    -------
-    t   : np.ndarray
-        Time vector
-    h_t : np.ndarray (complex)
-        Time-domain fading coefficients, normalized to unit average power.
-    
-    """
     c = 3e8
     v_mps = v_kph / 3.6
-    fd = (f_c * v_mps/c)
-    wd = 2*np.pi*fd
+    fd_max = (f_c * v_mps/c)
+    wd = 2*np.pi*fd_max
     t = np.arange(N) / f_s
     theta = random.uniform(-np.pi,np.pi)
     phi = random.uniform(-np.pi,np.pi)
@@ -50,7 +25,7 @@ def generate_rayleigh_fading_zx(M:int, N:int, f_s:float, f_c:float, v_kph:float)
 
     h_t = Xc_t + 1j*Xs_t
     h_t = h_t / np.sqrt(np.mean(np.abs(h_t)**2))
-    return t, h_t, fd
+    return h_t, fd_max
 
 # M = 16
 # N = int(50e3)

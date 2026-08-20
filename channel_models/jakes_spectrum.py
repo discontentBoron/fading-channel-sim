@@ -11,30 +11,6 @@ import matplotlib.pyplot as plt
 def generate_rayleigh_fading_smith(
     f_c: float, freq: np.ndarray, v_kph: float, f_s: float, N: int
 ):
-    """
-    Generate a complex Rayleigh fading channel using the Jakes/Smith method.
-
-    Parameters
-    ----------
-    fc : float
-        Carrier frequency in Hz.
-    freq : np.ndarray
-        Precomputed frequency axis (from np.fft.fftfreq).
-    v_kph : float
-        Mobile speed in km/h.
-    f_s : float
-        Sampling rate in Hz.
-    N : int
-        Number of time-domain samples to generate.
-    Returns
-    -------
-    h_t : np.ndarray (complex)
-        Time-domain fading coefficients, normalized to unit average power.
-    fd_max : float
-        Maximum Doppler shift in Hz.
-    S : np.ndarray
-        Jakes Doppler power spectrum evaluated at `freq`.
-    """
     c = 3e8
     v_mps = v_kph / 3.6
     fd_max = (v_mps * f_c) / c
