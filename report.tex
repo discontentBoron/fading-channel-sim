@@ -8,7 +8,6 @@
 \title{Effect of Vehicle Speed on Wireless Communication: \\
 Doppler Shift and Rayleigh Fading Analysis}
 \author{Hariharan G \\ 1CR23EC069}
-\date{\today}
 
 \begin{document}
 
@@ -41,7 +40,7 @@ fundamental principle related to the electromagnetic radio-wave propagation. The
 associated with an electromagnetic wave is deﬁned as the perceived change in the frequency of 
 the wave due to relative motion between the transmitter and receiver. 
 
-The Doppler shift is given by \cite{adithya}: 
+The Doppler shift is given by \cite{rappaport}: 
 \begin{equation}
     f_d = \frac{v}{\lambda}\cos\theta = \frac{v f_c}{c}\cos\theta
     \label{eq:doppler}
@@ -212,4 +211,63 @@ $E_b/N_0$ ($\gamma$) has the closed-form expression
 This expression is used throughout this report as the reference
 for validating simulation results.
 
+
+\section{Simulation Methodology}
+\subsection{Software Used}
+
+All simulations were implemented in \textbf{Python}, using the \textit{Numpy}  
+library for numerical computations, \textit{Scipy} for channel interpolation, and 
+\textit{Matplotlib} for visualization. 
+
+\newpage
+\subsection{Simulation Parameters}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ll}
+\hline
+\textbf{Parameter} & \textbf{Value} \\
+\hline
+Carrier frequency, $f_c$        & 2 GHz \\
+Vehicle speeds                  & 20, 60, 120 kmph \\
+Symbol rate, $f_s$               & 10 kHz \\
+Modulation                      & QPSK \\
+Number of bits simulated        & $10^5$--$10^6$ \\
+$E_b/N_0$ sweep range            & 0--25 dB (2 dB steps) \\
+Zheng--Xiao sinusoid count, $M$  & 12 \\
+Pilot spacing (sparse case)     & 15 symbols \\
+Pilot spacing (matched case)    & 8 symbols \\
+Channel estimation method       & Linear interpolation between pilots \\
+Equalization methods            & Zero-Forcing, MMSE \\
+\hline
+\end{tabular}
+\caption{Simulation parameters used throughout this project.}
+\label{tab:params}
+\end{table}
+
+Symbol rate of 10KHz was chosen to balance computation speed and simulation
+artifacts due to the Nyquist limit.
+
+\subsection{Simulation Flow}
+
+The simulation proceeds thorugh following stages for each speed and $E_b/N_0$ value:
+
+\begin{enumerate}
+    \item Generate a random bit-stream and modulate it into QPSK symbols (Eq. ~\ref{eq:qpsk_symbol}))
+    \item Insert known pilot symbols at fixed intervals into the transmitted symbol bit-stream
+    \item Generate the Rayleigh fading channel $h(t)$ for the given speed, using either Smith's spectral method or Zheng--Xiao sum-of sinusoids method.
+    \item Pass the transmitted signal through the fading channel and add AWGN corresponding to the target $E_b/N_0$ (Eq.~\ref{eq:channel_model}).
+    \item Estimate the channel at the receiver by interpolating between the pilot symbols.
+    \item Equalize the received signal using either Zero-Forcing or MMSE (Eqs.~\ref{eq:zf}, \ref{eq:mmse}).
+    \item Perform threshold-based QPSK demodulation and compute the Bit Error Rate by comparing recovered bits against the original bitstream.
+\end{enumerate}
+
+Figure~\ref{fig:blockdiagram} shows the simulation flow.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{blockdiagram.pdf}
+    \caption{Block diagram of simulation flow.}
+    \label{fig:blockdiagram}
+\end{figure}
 \end{document}
