@@ -42,19 +42,34 @@ if __name__ == "__main__":
         if fd_max > max_fd_overall:
             max_fd_overall = fd_max
         plt.plot(
-            freq_shifted,
-            S_f_mag,
-            label= f"{v_kph} km/h ($f_{{d,{{max}}}}$ = {fd_max:.1f} Hz)",
-            alpha=0.75,
+            np.arange(N)/f_s,
+            np.abs(h_t),
+            label= f"{v_kph} km/h"
         )
-    plt.xlim(-max_fd_overall * 1.2, max_fd_overall * 1.2)
+
+        plt.xlabel("Time (s)")
+        plt.ylabel("|h(t)|")
+                # plt.plot(
+        #     freq_shifted,
+        #     S_f_mag,
+        #     label= f"{v_kph} km/h ($f_{{d,{{max}}}}$ = {fd_max:.1f} Hz)",
+        #     alpha=0.75,
+        # )
+    # plt.xlim(-max_fd_overall * 1.2, max_fd_overall * 1.2)
 
     
-    plt.xlabel("Frequency (Hz)")
-    plt.ylabel("Magnitude $|S(f)|$")
+    # plt.xlabel("Frequency (Hz)")
+    # plt.ylabel("Magnitude $|S(f)|$")
+    # plt.grid(True, linestyle="--", alpha=0.6)
+    # plt.legend(loc="upper right")
+    # plt.tight_layout()
+    # plt.savefig('doppler_spectrum.pdf')
+    # plt.show()
+    plt.xlim(0, 0.07)
+    plt.xlabel("Time (s)")
+    plt.ylabel("|h(t)|")
     plt.grid(True, linestyle="--", alpha=0.6)
     plt.legend(loc="upper right")
     plt.tight_layout()
-    plt.savefig('doppler_spectrum.pdf')
+    plt.savefig('channel_gain.pdf')
     plt.show()
-
