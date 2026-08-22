@@ -3,27 +3,29 @@
 \usepackage{amsmath}
 \usepackage{hyperref}
 \usepackage{geometry}
+\usepackage{float}
+\usepackage{subcaption}
 \geometry{margin=1in}
 
 \title{Effect of Vehicle Speed on Wireless Communication: \\
 Doppler Shift and Rayleigh Fading Analysis}
 \author{Hariharan G \\ 1CR23EC069}
-
+\date{}
 \begin{document}
 
 \maketitle
 
 \section{Objective}
-To investigate the effects of changing vehicle or the receiver speed affects the Wireless
+To investigate the effects of vehicle or receiver speed affects the Wireless
 communication quality by studying the impact of Doppler shift and Rayleigh fading on the 
 Bit Error Rate (BER) of a Quadrature Phase Shift Keying (QPSK) communication systems.
 
 \section{Problem Statement}
 
 Mobile Wireless communication systems must contend with a time-varying channel caused by 
-the relative motion between the transmitter and receiver. This mostion introduces a Doppler 
+the relative motion between the transmitter and receiver. This motion introduces a Doppler 
 shift in the received signal frequency, and when combined with multipath propagation, gives 
-rise to Rayleigh fading, a rapid and random fluctuations in the received signal envelope. 
+rise to Rayleigh fading, rapid and random fluctuations in the received signal envelope. 
 As vehicle speed increases, the channel decorrelates more quickly (shorter
 coherence time), which can degrade the reliability of digital communication systems 
 that rely on accurate channel knowledge at the receiver.
@@ -35,7 +37,7 @@ a fast-changing channel using periodic pilot symbols.
 
 \section{Theory and Background}
 \subsection{Doppler Fading}
-Doppler Fading is a unique aspect of wireless communication systems. The Doppler shift is 
+Doppler Fading is a unique aspect of wireless communication systems. The Doppler shift is a 
 fundamental principle related to the electromagnetic radio-wave propagation. The Doppler shift 
 associated with an electromagnetic wave is deﬁned as the perceived change in the frequency of 
 the wave due to relative motion between the transmitter and receiver. 
@@ -56,7 +58,7 @@ arriving from different angles, each with a random amplitude,
 phase, and Doppler shift. By the Central Limit Theorem, the
 in-phase and quadrature components of the resulting received
 signal approach independent, zero-mean Gaussian random
-processes for a large number of scatterers \cite{stuber}. The
+processes for a large number of scatterers \cite{rappaport}. The
 envelope of this process, $|h(t)|$, is Rayleigh distributed:
 
 \begin{equation}
@@ -113,7 +115,7 @@ spectrum (Eq.~\ref{eq:jakes_spectrum}), and then applies an
 inverse FFT to obtain a time-domain fading waveform. This
 approach is a discrete, computationally efficient realization of
 the filtering technique originally proposed by Jakes
-\cite{jakes} and formalized by Smith.
+\cite{rappaport} and formalized by Smith.
 
 
 \subsubsection{Zheng--Xiao Sum-of-Sinusoids Method}
@@ -200,7 +202,7 @@ ZF at high SNR.
 
 For QPSK with coherent detection over a Rayleigh fading channel
 under perfect CSI, the average BER as a function of average
-$E_b/N_0$ ($\gamma$) has the closed-form expression
+$E_b/N_0$ ($\gamma$) has the expression
 \cite{simon_alouini}:
 
 \begin{equation}
@@ -215,14 +217,13 @@ for validating simulation results.
 \section{Simulation Methodology}
 \subsection{Software Used}
 
-All simulations were implemented in \textbf{Python}, using the \textit{Numpy}  
-library for numerical computations, \textit{Scipy} for channel interpolation, and 
+All simulations were implemented in \textbf{Python}, using the \textit{NumPy}  
+library for numerical computations, \textit{SciPy} for channel interpolation, and 
 \textit{Matplotlib} for visualization. 
 
-\newpage
 \subsection{Simulation Parameters}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \begin{tabular}{ll}
 \hline
@@ -235,7 +236,7 @@ Modulation                      & QPSK \\
 Number of bits simulated        & $10^5$--$10^6$ \\
 $E_b/N_0$ sweep range            & 0--25 dB (2 dB steps) \\
 Zheng--Xiao sinusoid count, $M$  & 12 \\
-Pilot spacing (sparse case)     & 15 symbols \\
+Pilot spacing (sparse case)     & 20 symbols \\
 Pilot spacing (matched case)    & 8 symbols \\
 Channel estimation method       & Linear interpolation between pilots \\
 Equalization methods            & Zero-Forcing, MMSE \\
@@ -245,12 +246,12 @@ Equalization methods            & Zero-Forcing, MMSE \\
 \label{tab:params}
 \end{table}
 
-Symbol rate of 10KHz was chosen to balance computation speed and simulation
+Symbol rate of 10~kHz was chosen to balance computation speed and simulation
 artifacts due to the Nyquist limit.
 
 \subsection{Simulation Flow}
 
-The simulation proceeds thorugh following stages for each speed and $E_b/N_0$ value:
+The simulation proceeds through following stages for each speed and $E_b/N_0$ value:
 
 \begin{enumerate}
     \item Generate a random bit-stream and modulate it into QPSK symbols (Eq. ~\ref{eq:qpsk_symbol}))
@@ -266,8 +267,183 @@ Figure~\ref{fig:blockdiagram} shows the simulation flow.
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{blockdiagram.pdf}
+    \includegraphics[width=0.75\textwidth]{./diagrams/blockdiagram.pdf}
     \caption{Block diagram of simulation flow.}
     \label{fig:blockdiagram}
 \end{figure}
+
+\section{Discussion}
+\subsection{Graphs and Interpretations}
+\subsubsection{Doppler Spectrum and Channel Gain}
+
+Figure~\ref{fig:doppler_spectrum} shows the Jakes Doppler power spectrum (Eq.~\ref{eq:jakes_spectrum}) for the three simulated speeds. As expected,
+higher speeds produce a wider spectral spread, with the characteristic ``bathtub'' sharply cutting off at $\pm f_{d,max}$.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.75\textwidth]{./diagrams/doppler_spectrum.pdf}
+    \caption{Jakes Doppler Spectrum at 20, 60 and 120 kmph}
+    \label{fig:doppler_spectrum}
+\end{figure}
+
+Figure~\ref{fig:channel_gain} shows the time-domain fading
+envelope $|h(t)|$ generated using Smith's spectral method. Faster speeds correspond to more rapid fluctuation of this 
+envelope, reflecting the shorter coherence time associated with higher Doppler spread.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.75\textwidth]{./diagrams/channel_gain.pdf}
+\caption{Rayleigh fading envelope $|h(t)|$ vs.\ time at 20, 60,
+and 120 kmph.}
+\label{fig:channel_gain}
+\end{figure}
+
+The statistical validity of the simulated channel was confirmed by comparing the histogram of $|h(t)|$ against the theoretical
+Rayleigh probability density function (Eq.~\ref{eq:rayleigh_pdf}), which showed close agreement for both the Smith and Zheng--Xiao
+generation methods.
+
+\subsubsection{BER under Perfect Channel State Information}
+
+Figure~\ref{fig:ber_perfect_csi} shows simulated BER vs.\
+$E_b/N_0$ under Rayleigh fading, assuming the receiver has
+perfect, instantaneous knowledge of $h(t)$. All three speeds
+produce nearly identical BER curves, and both independent
+fading generation methods (Smith's and Zheng--Xiao) agree
+closely with the theoretical Rayleigh-fading QPSK BER formula
+(Eq.~\ref{eq:theoretical_ber}).
+
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{./diagrams/ber_perfect_csi.pdf}
+    \caption{Simulated using Smith's method}
+    \label{fig:ber_perfect_csi_jk}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{./diagrams/ber_perfect_csi_zx.pdf}
+    \caption{Simulated using Zheng-Xiao's method}
+    \label{fig:ber_perfect_csi_zx}
+\end{subfigure}
+\caption{Simulated BER vs.\ $E_b/N_0$ under perfect CSI for 20, 60, and 120 kmph, compared against the theoretical Rayleigh
+BER curve.}
+\label{fig:ber_perfect_csi}
+\end{figure}
+
+Since the receiver has perfect Channel State Information (CSI) at every instant of time, it instantly knows
+the exact channel state for every symbol and cancels it out completely.
+
+\subsubsection{BER under Realistic Pilot-Based Channel Estimation}
+
+Figure~\ref{fig:ber_sparse_pilot} shows BER vs.\ $E_b/N_0$ when the receiver instead estimates $h(t)$ via linear interpolation
+between pilot symbols spaced 20 symbols apart. Here, a clear speed-dependent gap emerges: 120~kmph performs consistently
+worse than 60~kmph, which performs worse than 20~kmph, with the gap widening as $E_b/N_0$ increases.
+
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{./diagrams/ber_sparse_pilot.pdf}
+    \caption{Simulated using Smith's method}
+    \label{fig:ber_sparse_pilot_jk}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{./diagrams/ber_sparse_pilot_zx.pdf}
+    \caption{Simulated using Zheng-Xiao's method}
+    \label{fig:ber_sparse_pilot_zx}
+\end{subfigure}
+\caption{Simulated BER vs.\ $E_b/N_0$ with pilot-based channel
+estimation (pilot spacing = 20 symbols), for 20, 60, and 120
+kmph.}
+\label{fig:ber_sparse_pilot}
+\end{figure}
+
+At low SNRs, additive noise is the main cause of bit errors, so speed makes little difference and the curves stay close together.
+
+At high SNRs, noise drops off and channel estimation error takes over as the main bottleneck. Because the channel changes faster at higher 
+speeds, a fixed pilot spacing cannot keep up with rapid fluctuations. This creates an error floor where BER flattens out and stops improving, 
+making the gap between speeds much wider which is clearly visible at 120 kmph.
+
+\subsubsection{Effect of Pilot Spacing}
+
+The pilot spacing was reduced to 8 symbols -- matching the calculated coherence time at 120~kmph
+(Eq.~\ref{eq:coherence_time}). Figure~\ref{fig:ber_matched_pilot} shows that under this denser pilot spacing, the BER gap between
+speeds nearly disappears, with all three curves converging close to the perfect-CSI result.
+
+
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{./diagrams/ber_matched_pilot.pdf}
+    \caption{Simulated using Smith's method}
+    \label{fig:ber_matched_pilot_jk}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{./diagrams/ber_matched_pilot_zx.pdf} % Replace with your image filename
+    \caption{Simulated using Zheng-Xiao method.}
+    \label{fig:ber_matched_pilot_zx}
+\end{subfigure}
+
+\caption{Simulated BER vs.\ $E_b/N_0$ with pilot spacing reduced to 8 symbols
+    (matched to the 120 kmph coherence time), for 20, 60, and 120 kmph.}
+\label{fig:ber_matched_pilot}
+\end{figure}
+
+This result provides direct, quantitative simulation evidence
+that speed-dependent BER degradation is driven by
+\emph{channel estimation staleness} relative to coherence time,
+rather than by the fading process itself.
+
+\section{Conclusion}
+This project investigated the impact of vehicle speed on wireless communication 
+quality by simulating Doppler shift, Rayleigh fading, and QPSK link performance 
+using two channel generation techniques: Smith’s spectral shaping method and the 
+Zheng–Xiao sum-of-sinusoids method. The findings indicate that signal degradation 
+at higher speeds is not driven by fading statistics alone, but by practical 
+channel estimation limits. As vehicle speed increases, the channel's coherence 
+time decreases, causing pilot-based estimates to become stale more quickly. 
+This was demonstrated by observing a significant BER gap between speeds when 
+pilot spacing exceeded the coherence time, and showing that this gap closed when 
+pilot spacing was reduced to match the shortened coherence time at high speeds.
+
+Therefore, at lower speeds the longer coherence time allows pilot-based 
+interpolation to track the channel more accurately which directly results in
+better performance. At higher speeds, however, the channel changes faster than 
+the receiver can estimate using the pilot-based estimation leading to call drops 
+and reduced communication quality. For this reason, modern cellular standards 
+adaptively scale reference signal (pilot) density for high-mobility 
+user equipment.
+
+Overall, this project confirmed theoretical Rayleigh fading models, 
+explained why vehicle speed degrades wireless signal quality.
+
+
+\begin{thebibliography}{9}
+
+\bibitem{rappaport}
+T. S. Rappaport,
+\textit{Wireless Communications: Principles and Practice},
+2nd ed. Upper Saddle River, NJ: Prentice Hall, 2002.
+
+\bibitem{zhengxiao}
+Y. R. Zheng and C. Xiao,
+``Simulation Models With Correct Statistical Properties for
+Rayleigh Fading Channels,''
+\textit{IEEE Transactions on Communications}, vol. 51, no. 6,
+pp. 920--928, Jun. 2003.
+
+\bibitem{simon_alouini}
+M. K. Simon and M.-S. Alouini,
+\textit{Digital Communication over Fading Channels},
+2nd ed. Hoboken, NJ: Wiley-Interscience, 2005.
+
+\end{thebibliography}
+
 \end{document}
