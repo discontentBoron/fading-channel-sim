@@ -1,8 +1,8 @@
 import numpy as np
 from scipy.interpolate import interp1d
 from config import CONFIG
-from channel_models.zheng_xiao import generate_rayleigh_fading_zx
-from channel_models.jakes_spectrum import generate_rayleigh_fading_smith
+from zheng_xiao import generate_rayleigh_fading_zx
+from smiths_model import generate_rayleigh_fading_smith
 
 def generate_bits(bit_size):
     #np.random.seed(42)
