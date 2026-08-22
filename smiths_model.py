@@ -1,13 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# f_c = 2e9
-# f_s = 10e3
-# N = int(50e3)
-# t = np.arange(N) / f_s
-# freq = np.fft.fftfreq(int(N), d=1 / f_s)
-
-
 def generate_rayleigh_fading_smith(
     f_c: float, freq: np.ndarray, v_kph: float, f_s: float, N: int
 ):
@@ -24,40 +17,44 @@ def generate_rayleigh_fading_smith(
     return h_t, fd_max, S
 
 
-# speeds = [20, 60, 120]
-# results = {}
-# for v in speeds:
-#     h_t, fd_max, S = generate_rayleigh_fading_smith(f_c, freq, v, f_s, N)
-#     results[v] = (h_t, fd_max, S)
 
-# t = np.arange(N) / f_s
+if __name__ == "__main__":
+    from utils import *
+    from config import CONFIG
+    from qpsk_modulation import modulate_qpsk
+    bit_length = CONFIG["bit_length"]
+    pilot_spacing = CONFIG["pilot_spacing"]
+    f_s = CONFIG["f_s"]
+    f_c = CONFIG["f_c"]
+    speeds = CONFIG["speeds"]
+    Eb_N0_dB_range = CONFIG["Eb_N0_dB_range"]
+    model = CONFIG["model"]
+    bit_stream = generate_bits(bit_length)
+    qpsk_sig = modulate_qpsk(bit_stream)
+    N = len(qpsk_sig)
+    freq = np.fft.fftfreq(N, d=1 / f_s)
+    plt.figure(figsize=(10, 6))
+    freq_shifted = np.fft.fftshift(freq)
+    max_fd_overall = 0
+    for v_kph in speeds:
+        h_t, fd_max, S = generate_rayleigh_fading_smith(f_c, freq, v_kph, f_s, N)
+        S_f_mag = np.fft.fftshift(S)
+        if fd_max > max_fd_overall:
+            max_fd_overall = fd_max
+        plt.plot(
+            freq_shifted,
+            S_f_mag,
+            label= f"{v_kph} km/h ($f_{{d,{{max}}}}$ = {fd_max:.1f} Hz)",
+            alpha=0.75,
+        )
+    plt.xlim(-max_fd_overall * 1.2, max_fd_overall * 1.2)
 
-# fig, axes = plt.subplots(3, 1, figsize=(12, 8), sharex=True)
-# for ax, v in zip(axes, speeds):
-#     h_t, fd_max, S = results[v]
-#     ax.plot(t, np.abs(h_t))
-#     ax.set_ylabel("|h(t)|")
-#     ax.set_title(f"{v} kmph (fd_max = {fd_max:.1f} Hz)")
-# axes[-1].set_xlabel("Time (s)")
-# plt.tight_layout()
-# plt.show()
-# Plots
-# Frequency domain plot of S(f)
-"""S_shifted = np.fft.fftshift(S)
-freq_shifted = np.fft.fftshift(freq)
-plt.plot(freq_shifted, S_shifted)
-plt.ylabel("S(f)")
-plt.xlabel("Frequency(in Hz)")
-plt.title(f"Jakes Doppler Spectrum (60 kmph, fd_max={fd_max:.1f} Hz)")
-plt.show()
+    
+    plt.xlabel("Frequency (Hz)")
+    plt.ylabel("Magnitude $|S(f)|$")
+    plt.grid(True, linestyle="--", alpha=0.6)
+    plt.legend(loc="upper right")
+    plt.tight_layout()
+    plt.savefig('doppler_spectrum.pdf')
+    plt.show()
 
-# Time domain plot of S(f)
-plt.plot(t, np.abs(h_t))
-plt.title("Time domain plot of S(f)")
-plt.xlabel("Index")
-plt.ylabel("s(t)")
-plt.show()
-
-# Histogram
-plt.hist(np.abs(h_t))
-plt.show()"""
