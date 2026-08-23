@@ -33,43 +33,48 @@ if __name__ == "__main__":
     qpsk_sig = modulate_qpsk(bit_stream)
     N = len(qpsk_sig)
     freq = np.fft.fftfreq(N, d=1 / f_s)
-    plt.figure(figsize=(10, 6))
     freq_shifted = np.fft.fftshift(freq)
+    time_axis = np.arange(N) / f_s
     max_fd_overall = 0
+
+    fig_spec, ax_spec = plt.subplots(figsize=(10, 6))
+    fig_gain, ax_gain = plt.subplots(figsize=(10, 6))
+
     for v_kph in speeds:
         h_t, fd_max, S = generate_rayleigh_fading_smith(f_c, freq, v_kph, f_s, N)
         S_f_mag = np.fft.fftshift(S)
         if fd_max > max_fd_overall:
             max_fd_overall = fd_max
-        plt.plot(
-            np.arange(N)/f_s,
-            np.abs(h_t),
-            label= f"{v_kph} km/h"
+        ax_spec.plot(
+            freq_shifted,
+            S_f_mag,
+            label=f"{v_kph} km/h ($f_{{d,max}}$ = {fd_max:.1f} Hz)",
+            alpha=0.75,
         )
 
-        plt.xlabel("Time (s)")
-        plt.ylabel("|h(t)|")
-                # plt.plot(
-        #     freq_shifted,
-        #     S_f_mag,
-        #     label= f"{v_kph} km/h ($f_{{d,{{max}}}}$ = {fd_max:.1f} Hz)",
-        #     alpha=0.75,
-        # )
-    # plt.xlim(-max_fd_overall * 1.2, max_fd_overall * 1.2)
+        # Plot 2: Time-Domain Channel Gain |h(t)|
+        ax_gain.plot(
+            time_axis,
+            np.abs(h_t),
+            label=f"{v_kph} km/h",
+            alpha=0.85,
+        )
+    ax_spec.set_xlim(-max_fd_overall * 1.2, max_fd_overall * 1.2)
+    ax_spec.set_xlabel("Frequency (Hz)")
+    ax_spec.set_ylabel("Magnitude $|S(f)|$")
+    ax_spec.set_title("Rayleigh Fading Doppler Power Spectrum")
+    ax_spec.grid(True, linestyle="--", alpha=0.6)
+    ax_spec.legend(loc="upper right")
+    fig_spec.tight_layout()
+    fig_spec.savefig("doppler_spectrum.pdf")
 
-    
-    # plt.xlabel("Frequency (Hz)")
-    # plt.ylabel("Magnitude $|S(f)|$")
-    # plt.grid(True, linestyle="--", alpha=0.6)
-    # plt.legend(loc="upper right")
-    # plt.tight_layout()
-    # plt.savefig('doppler_spectrum.pdf')
-    # plt.show()
-    plt.xlim(0, 0.07)
-    plt.xlabel("Time (s)")
-    plt.ylabel("|h(t)|")
-    plt.grid(True, linestyle="--", alpha=0.6)
-    plt.legend(loc="upper right")
-    plt.tight_layout()
-    plt.savefig('channel_gain.pdf')
+    ax_gain.set_xlim(0, 0.07)
+    ax_gain.set_xlabel("Time (s)")
+    ax_gain.set_ylabel("Channel Magnitude $|h(t)|$")
+    ax_gain.set_title("Rayleigh Fading Channel Magnitude over Time")
+    ax_gain.grid(True, linestyle="--", alpha=0.6)
+    ax_gain.legend(loc="upper right")
+    fig_gain.tight_layout()
+    fig_gain.savefig("channel_gain.pdf")
+
     plt.show()
