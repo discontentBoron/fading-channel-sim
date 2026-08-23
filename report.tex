@@ -16,9 +16,9 @@ Doppler Shift and Rayleigh Fading Analysis}
 \maketitle
 
 \section{Objective}
-To investigate the effects of vehicle or receiver speed affects the Wireless
-communication quality by studying the impact of Doppler shift and Rayleigh fading on the 
-Bit Error Rate (BER) of a Quadrature Phase Shift Keying (QPSK) communication systems.
+To investigate the effects of vehicle or receiver speed on wireless communication quality,
+this project studies the impact of Doppler shift and Rayleigh fading on the Bit Error Rate (BER)
+of Quadrature Phase Shift Keying (QPSK) communication systems.
 
 \section{Problem Statement}
 
@@ -186,17 +186,14 @@ scenarios were studied:
     between them, as is done in practical systems.
 \end{itemize}
 
-Two equalization strategies were implemented:
+For equalization the Zero-Forcing method was implemented:
 
 \begin{align}
     \text{Zero-Forcing (ZF):} \quad & \hat{s} = \frac{y}{h} \label{eq:zf}\\
-    \text{MMSE:} \quad & \hat{s} = \frac{h^{*}}{|h|^2 + N_0}\, y \label{eq:mmse}
 \end{align}
 
 ZF perfectly inverts the channel but amplifies noise
-significantly when $|h|$ is small (deep fade). MMSE balances
-channel inversion against noise amplification, and reduces to
-ZF at high SNR.
+significantly when $|h|$ is small (deep fade).
 
 \subsection{Theoretical QPSK BER over Rayleigh Fading}
 
@@ -259,7 +256,7 @@ The simulation proceeds through following stages for each speed and $E_b/N_0$ va
     \item Generate the Rayleigh fading channel $h(t)$ for the given speed, using either Smith's spectral method or Zheng--Xiao sum-of sinusoids method.
     \item Pass the transmitted signal through the fading channel and add AWGN corresponding to the target $E_b/N_0$ (Eq.~\ref{eq:channel_model}).
     \item Estimate the channel at the receiver by interpolating between the pilot symbols.
-    \item Equalize the received signal using either Zero-Forcing or MMSE (Eqs.~\ref{eq:zf}, \ref{eq:mmse}).
+    \item Equalize the received signal using Zero-Forcing (Eqs.~\ref{eq:zf}).
     \item Perform threshold-based QPSK demodulation and compute the Bit Error Rate by comparing recovered bits against the original bitstream.
 \end{enumerate}
 
